@@ -137,5 +137,9 @@ h1 {
     .boxes .box-filled-2 {
       background-color: #3688C3;
       background-image: url(../img/x.svg); }
-
-
+    .boxes .box-active-1:hover {
+      background-image: url(../img/o.svg);
+    }
+    .boxes .box-active-2:hover {
+      background-image: url(../img/x.svg);
+    }

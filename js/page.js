@@ -1,9 +1,19 @@
 (function(){
 	
+	const winningCombinations = [
+		[0, 1, 2],
+		[3, 4, 5],
+		[6, 7, 8],
+		[0, 3, 6],
+		[1, 4, 7],
+		[2, 5, 8],
+		[2, 4, 6],
+		[0, 4, 8]
+	];
+
 	class Player {
-		constructor(id, symbol) {
+		constructor(id) {
 			this.id = id;
-			this.symbol = symbol;
 			this.name = "";
 			this.isHuman = true;
 		}
@@ -21,22 +31,36 @@
 			this.isStarted = false;
 			this.isEnded = false;
 			this.players = {
-				player1: new Player(1, 'o'), 
-				player2: new Player(2, 'x')
+				player1: new Player('1'), 
+				player2: new Player('2')
 			};
 			this.activePlayer = this.players.player1;
-			this.board = [
-				new Square(0),
-				new Square(1),
-				new Square(2),
-				new Square(3),
-				new Square(4),
-				new Square(5),
-				new Square(6),
-				new Square(7),
-				new Square(8)
-			];
+			this.board = (function() {
+				let squaresArray = [];
+				for (let i = 0; i < 9; i++) {
+					squaresArray.push(new Square(i));
+				}
+				return squaresArray;
+			})();
 		}
+		
+		get winner() {
+			// Calculate winner (null if none)
+			const winner = '';
+			winningCombinations.forEach(combo, () => {
+				let comboSquares = this.board.filter(square => combo.includes(square.id));
+				let comboSquareOwners = comboSquares.map(square.owner);
+				if (comboSquareOwners.every(owner => owner === this.players.player1)) {
+					winner = this.players.player1;
+				} else if (comboSquareOwners.every(owner => owner === this.players.player2)) {
+					winner = this.players.player2;
+				}
+			});
+			if (this.board.every(square => square.owner !== '')) {
+				winner = 'tie'
+			}
+			return winner;
+		};
 	}
 
 	let startDiv = document.querySelector('#start');
@@ -70,19 +94,37 @@
 	}
 
 	const drawBoxes = () => {
+		const activePlayerId = thisGame.activePlayer.id;
 		boxes.innerHTML = '';
 		thisGame.board.forEach(box => {
+			const boxOwnerId = box.owner.id;
 			let boxLi = document.createElement('li');
 			boxes.appendChild(boxLi);
 			if (box.owner === '') {
 				// Style for active player to mouse over
-
+				boxLi.classList.add('box', 'box-unclaimed', `box-active-${activePlayerId}`);
 			} else {
 				// style for owner
-				boxLi.style.backgroundImage = `url(img/${box.owner.symbol}.svg)`;
-				boxLi.classList.add(`box box-filled-${box.owner.id}`);
+				boxLi.classList.add('box', `box-filled-${boxOwnerId}`);
 			}
 		});
+	}
+
+	const claimSquare = (squareId) => {
+		// Check if square is unclaimed
+		if (thisGame.board[squareId].owner === '') {
+			// Update square.owner
+			thisGame.board[squareId].owner = thisGame.activePlayer;
+			// Check for winner
+			if (thisGame.winner != '') {
+				thisGame.isEnded = true;
+			} else if (thisGame.activePlayer.id === '1') { // If no winner, update active player and redraw squares
+				thisGame.activePlayer = thisGame.players.player2;
+			} else {
+				thisGame.activePlayer = thisGame.players.player1;
+			}
+			drawPage();
+		} 
 	}
 
 	const writeStartHtml = () => {
@@ -97,7 +139,7 @@
 		finishDiv.style.display = 'none';
 
 		highlightActivePlayer();
-
+		drawBoxes();
 	}
 	
 	const drawPage = () => {
@@ -111,7 +153,9 @@
 	}
 
 	const writeFinishHtml = () => {
-		// foo
+		startDiv.style.display = 'none';
+		boardDiv.style.display = 'none';
+		finishDiv.style.display = '';
 	}
 
 	drawPage(thisGame);
@@ -119,6 +163,16 @@
 	startGameButton.addEventListener('click', () => {
 		startGame();
 		drawPage(); 
+	});
+
+	document.querySelector('.boxes').addEventListener('click', (e) => {
+		// Figure out which box ID got clicked 
+		const clickedSquare = e.target; 
+		const getElementIndex = (element) => {
+			return [...element.parentNode.children].indexOf(element);
+		}
+		const squareId = getElementIndex(clickedSquare);
+		claimSquare(squareId);
 	});
 
 })();
