@@ -1,5 +1,17 @@
 (function(){
+	// Setting vars for relevant DOM elements
+	let startDiv = document.querySelector('#start');
+		let startGameButton = document.querySelector('#start-game');
+	let boardDiv = document.querySelector('#board');
+		let player1Li = document.querySelector('#player1');
+		let player2Li = document.querySelector('#player2');
+		let boxes = document.querySelector('ul.boxes');
+	let finishDiv = document.querySelector('#finish');
+		let finishMessage = document.querySelector('.message');
+		let playAgainButton = document.querySelector('#play-again');
+		let newPlayersButton = document.querySelector('#new-players');
 	
+	// Devining classes
 	class Player {
 		constructor(id) {
 			this.id = id;
@@ -32,9 +44,21 @@
 				return squaresArray;
 			})();
 		}
+
+		setupNextGame() { // Keep players' names and isHuman state, reset the rest, start game
+			this.isStarted = true;
+			this.isEnded = false;
+			this.activePlayer = this.players.player1;
+			this.board = (function() {
+				let squaresArray = [];
+				for (let i = 0; i < 9; i++) {
+					squaresArray.push(new Square(i));
+				}
+				return squaresArray;
+			})();
+		}
 		
-		get winner() {
-			// Calculate winner (null if none)
+		get winner() { // Winner is dynamically calculated as this.winner
 			let winner = '';
 			winningCombinations.forEach((combo) => {
 				let comboSquares = this.board.filter(square => combo.includes(square.id));
@@ -52,12 +76,7 @@
 		};
 	}
 
-	const startGame = () => {
-		thisGame = new Game();
-		thisGame.isStarted = true;
-		thisGame.activePlayer = thisGame.players.player1;
-	}
-
+	// Functions that drive state and UI changes
 	const highlightActivePlayer = () => {
 		switch (thisGame.activePlayer) {
 			case thisGame.players.player1: 
@@ -88,6 +107,22 @@
 		});
 	}
 
+	const displayWinner = () => {
+		if (thisGame.winner === 'tie') {
+			finishDiv.classList.add('screen-win-tie');
+			finishDiv.classList.remove('screen-win-one', 'screen-win-two');
+			finishMessage.textContent = `It's a Tie!`;
+		} else if (thisGame.winner === thisGame.players.player1) {
+			finishDiv.classList.add('screen-win-one');
+			finishDiv.classList.remove('screen-win-tie', 'screen-win-two');
+			finishMessage.textContent = `Winner`;
+		} else if (thisGame.winner === thisGame.players.player2) {
+			finishDiv.classList.add('screen-win-two');
+			finishDiv.classList.remove('screen-win-tie', 'screen-win-one');
+			finishMessage.textContent = `Winner`;
+		}
+	}
+
 	const writeStartHtml = () => {
 		startDiv.style.display = '';
 		boardDiv.style.display = 'none';
@@ -98,7 +133,6 @@
 		startDiv.style.display = 'none';
 		boardDiv.style.display = '';
 		finishDiv.style.display = 'none';
-
 		highlightActivePlayer();
 		drawBoxes();
 	}
@@ -107,6 +141,7 @@
 		startDiv.style.display = 'none';
 		boardDiv.style.display = 'none';
 		finishDiv.style.display = '';
+		displayWinner();
 	}
 	
 	const drawPage = () => {
@@ -119,37 +154,22 @@
 		}
 	}
 
-	const getClickedElementIndex = (element) => {
-		return [...element.parentNode.children].indexOf(element);
-	}
-
-	const updateClickedSquare = (squareId) => {
+	const updateClickedSquare = (element) => {
+		const squareId = [...element.parentNode.children].indexOf(element);
 		// Check if square is unclaimed
 		if (thisGame.board[squareId].owner === '') {
 			// Update square.owner
 			thisGame.board[squareId].owner = thisGame.activePlayer;
 			// Check for winner
 			if (thisGame.winner != '') {
-				debugger;
-				let winner = thisGame.winner;
 				thisGame.isEnded = true;
 			} else if (thisGame.activePlayer.id === '1') { // If no winner, update active player and redraw squares
 				thisGame.activePlayer = thisGame.players.player2;
 			} else {
 				thisGame.activePlayer = thisGame.players.player1;
 			}
-			drawPage();
 		} 
 	}
-
-	let startDiv = document.querySelector('#start');
-		let startGameButton = document.querySelector('#start-game');
-	let boardDiv = document.querySelector('#board');
-		let player1Li = document.querySelector('#player1');
-		let player2Li = document.querySelector('#player2');
-		let boxes = document.querySelector('ul.boxes');
-	let finishDiv = document.querySelector('#finish');
-		let newGameButton = document.querySelector('#new-game');
 
 	const winningCombinations = [
 		[0, 1, 2],
@@ -163,17 +183,26 @@
 	];
 
 	let thisGame = new Game();
-
 	drawPage(thisGame);
 
 	startGameButton.addEventListener('click', () => {
-		startGame();
+		thisGame.isStarted = true;
 		drawPage(); 
 	});
 
 	document.querySelector('.boxes').addEventListener('click', (e) => {
-		const clickedSquare = e.target; 
-		updateClickedSquare(getClickedElementIndex(clickedSquare));
+		updateClickedSquare(e.target);
+		drawPage();
+	});
+
+	playAgainButton.addEventListener('click', () => {
+		thisGame.setupNextGame();
+		drawPage();
+	});
+
+	newPlayersButton.addEventListener('click', () => {
+		thisGame = new Game();
+		drawPage();
 	});
 
 })();
