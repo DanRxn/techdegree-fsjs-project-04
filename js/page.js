@@ -72,11 +72,10 @@
 					winner = this.players.player1;
 				} else if (comboSquareOwners.every(owner => owner === this.players.player2)) {
 					winner = this.players.player2;
+				} else if (this.board.every(square => square.owner !== '')) {
+					winner = 'tie'
 				}
 			});
-			if (this.board.every(square => square.owner !== '')) {
-				winner = 'tie'
-			}
 			return winner;
 		};
 	}
@@ -203,6 +202,7 @@
 		if (namePlayer1.value !== '') {thisGame.players.player1.name = namePlayer1.value};
 		if (namePlayer2.value !== '') {thisGame.players.player2.name = namePlayer2.value};
 		drawPage(); 
+		startGameForm.reset();
 	});
 
 	document.querySelector('.boxes').addEventListener('click', (e) => {
