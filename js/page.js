@@ -72,10 +72,11 @@
 					winner = this.players.player1;
 				} else if (comboSquareOwners.every(owner => owner === this.players.player2)) {
 					winner = this.players.player2;
-				} else if (this.board.every(square => square.owner !== '')) {
-					winner = 'tie'
 				}
 			});
+			if (this.board.every(square => square.owner !== '' && winner == '')) {
+				winner = 'tie'
+			}
 			return winner;
 		};
 	}
