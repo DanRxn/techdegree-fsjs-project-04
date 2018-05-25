@@ -14,11 +14,21 @@
     <header>
       <h1>Tic Tac Toe</h1>
       <form>
+        <br>
         <h2>Mode</h2>
-        <input type="radio" name="player-count" value="two-players" id="two-players" checked>
-        <label for="two-players">Two players</label><br><br>
-        <input type="radio" name="player-count" value="one-player" id="one-player">
-        <label for="one-player">One player (vs. computer)</label><br><br>
+        <div id="select-player-count">
+          <label for="two-players">
+              <input type="radio" name="player-count" value="2" id="two-players" checked>
+              Two players
+          </label>
+          <br>
+          <br>
+          <label for="one-player">
+            <input type="radio" name="player-count" value="1" id="one-player">
+            One player (vs. computer)</label>
+            <br>
+            <br>
+        </div>
         <h2>Names</h2>
         <input type="text" name="name-player-1" id="name-player-1" placeholder="Player 1">
         <h4>vs</h4>

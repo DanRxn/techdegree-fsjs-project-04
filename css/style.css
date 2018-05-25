@@ -3,6 +3,10 @@ body {
   background: #fff;
   font-family: "Montserrat", sans-serif; }
 
+input {
+  padding: 10px;
+}
+
 ul {
   margin: 0;
   padding: 0;

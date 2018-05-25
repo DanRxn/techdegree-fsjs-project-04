@@ -3,6 +3,9 @@
 	// Setting vars for relevant DOM elements
 	let startDiv = document.querySelector('#start');
 		let startGameForm = document.querySelector('form');
+			let selectPlayerCountDiv = document.querySelector('#select-player-count');
+				let twoPlayersRadio = document.querySelector('#two-players');
+				let onePlayerRadio = document.querySelector('#one-player');
 			let namePlayer1 = document.querySelector('#name-player-1');
 			let namePlayer2 = document.querySelector('#name-player-2');
 	let boardDiv = document.querySelector('#board');
@@ -82,6 +85,28 @@
 	}
 
 	// Functions that drive state and UI changes
+	const setupMode = (numberOfPlayers) => {
+		let player2NameField;
+		let player2NameDisabled;
+		let player2IsHuman;
+		switch (numberOfPlayers) {
+			case '2': 
+				player2NameField = '';
+				player2NameDisabled = false;
+				player2IsHuman = true;
+				break;
+			case '1':
+				player2NameField = '🤖 Alexa';
+				player2NameDisabled = true;
+				player2IsHuman = false;
+				break;
+			default: console.log('Something broke in or around setupMode() :( ');
+		}
+		namePlayer2.value = player2NameField;
+		namePlayer2.disabled = player2NameDisabled;
+		thisGame.players.player2.isHuman = player2IsHuman;
+	}
+	
 	const highlightActivePlayer = () => {
 		switch (thisGame.activePlayer) {
 			case thisGame.players.player1: 
@@ -196,6 +221,11 @@
 
 	let thisGame = new Game();
 	drawPage(thisGame);
+
+	selectPlayerCountDiv.addEventListener('change', (e) => {
+		const numberOfPlayers = e.target.value;
+		setupMode(numberOfPlayers);
+	});
 
 	startGameForm.addEventListener('submit', () => {
 		event.preventDefault();
