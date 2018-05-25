@@ -154,6 +154,18 @@
 		} 
 	}
 
+	const alexaChooseSquare = () => {
+		if (!thisGame.activePlayer.isHuman) {
+			setTimeout(() => {
+				const unclaimedSquareObjects = thisGame.board.filter(square => square.owner == '');
+				const alexasSquare = unclaimedSquareObjects[Math.floor(Math.random() * unclaimedSquareObjects.length)];
+				const alexasBox = document.querySelectorAll('.box').item(alexasSquare.id); 
+				updateClickedSquare(alexasBox);
+				drawPage();	
+			}, 2000);
+		}
+	}
+
 	const displayWinner = () => {
 		switch (thisGame.winner) {
 			case 'tie': 
@@ -237,8 +249,11 @@
 	});
 
 	document.querySelector('.boxes').addEventListener('click', (e) => {
-		updateClickedSquare(e.target);
-		drawPage();
+		if (thisGame.activePlayer.isHuman) {
+			updateClickedSquare(e.target);
+			drawPage();
+			alexaChooseSquare();
+		}
 	});
 
 	playAgainButton.addEventListener('click', () => {
