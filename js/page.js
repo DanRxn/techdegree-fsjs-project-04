@@ -4,8 +4,6 @@
 	let startDiv = document.querySelector('#start');
 		let startGameForm = document.querySelector('form');
 			let selectPlayerCountDiv = document.querySelector('#select-player-count');
-				let twoPlayersRadio = document.querySelector('#two-players');
-				let onePlayerRadio = document.querySelector('#one-player');
 			let namePlayer1 = document.querySelector('#name-player-1');
 			let namePlayer2 = document.querySelector('#name-player-2');
 	let boardDiv = document.querySelector('#board');
@@ -66,7 +64,7 @@
 			})();
 		}
 		
-		get winner() { // Winner is dynamically calculated as this.winner
+		get winner() { // Winner is dynamically calculated as property, this.winner
 			let winner = '';
 			winningCombinations.forEach((combo) => {
 				let comboSquares = this.board.filter(square => combo.includes(square.id));
@@ -85,7 +83,7 @@
 	}
 
 	// Functions that drive state and UI changes
-	const setupMode = (numberOfPlayers) => {
+	const setupForMode = (numberOfPlayers) => {
 		let player2NameField;
 		let player2NameDisabled;
 		let player2IsHuman;
@@ -146,7 +144,7 @@
 			// Check for winner
 			if (thisGame.winner != '') {
 				thisGame.isEnded = true;
-			} else if (thisGame.activePlayer.id === '1') { // If no winner, update active player and redraw squares
+			} else if (thisGame.activePlayer.id === '1') { // If no winner, update active player and redraw squares...
 				thisGame.activePlayer = thisGame.players.player2;
 			} else {
 				thisGame.activePlayer = thisGame.players.player1;
@@ -234,13 +232,14 @@
 	let thisGame = new Game();
 	drawPage(thisGame);
 
+	// Event listeners for user interaction
 	selectPlayerCountDiv.addEventListener('change', (e) => {
 		const numberOfPlayers = e.target.value;
-		setupMode(numberOfPlayers);
+		setupForMode(numberOfPlayers);
 	});
 
-	startGameForm.addEventListener('submit', () => {
-		event.preventDefault();
+	startGameForm.addEventListener('submit', (e) => {
+		e.preventDefault();
 		thisGame.isStarted = true;
 		if (namePlayer1.value !== '') {thisGame.players.player1.name = namePlayer1.value};
 		if (namePlayer2.value !== '') {thisGame.players.player2.name = namePlayer2.value};
